@@ -11,14 +11,20 @@ class BPETokenizer:
         self.num2char = {}
         self.num_text = None
         self.original_length = None
-        self.unk_token = "<UNK>"
+        self.special_tokens = ["<pad>", "<sos>", "<eos>", "<unk>"]
+        self.pad_token = "<pad>"
+        self.sos_token = "<sos>"
+        self.eos_token = "<eos>"
+        self.unk_token = "<unk>"
+        self.pad_id = self.special_tokens.index("<pad>")
+        self.sos_id = self.special_tokens.index("<sos>")
+        self.eos_id = self.special_tokens.index("<eos>")
+        self.unk_id = self.special_tokens.index("<unk>")
 
     def _init_vocab(self, text):
         text = list(text)
-        self.vocab = sorted(set(text))
-
-        if self.unk_token not in self.vocab:
-            self.vocab.append(self.unk_token)
+        unique_chars = sorted(set(text))
+        self.vocab = self.special_tokens + [c for c in unique_chars if c not in self.special_tokens]
 
         self.char2num = {v: i for i, v in enumerate(self.vocab)}
         self.num2char = {i: v for i, v in enumerate(self.vocab)}
@@ -68,9 +74,10 @@ class BPETokenizer:
             print(f"{step:>4} | {str((self.num2char[most_common_pair[0]], self.num2char[most_common_pair[1]])):^10} |"
                   f" {len(self.num_text):>9} | {len(self.num_text) / self.original_length:>7.4f} | {len(self.vocab):>6}")
 
-    def encode(self, text):
-        unk_id = self.char2num[self.unk_token]
-        tokens = [self.char2num.get(c, unk_id) for c in text]
+    def encode(self, text, add_special_tokens=False):
+        tokens = [self.char2num.get(c, self.unk_id) for c in text]
+        if add_special_tokens:
+            tokens = [self.sos_id] + tokens + [self.eos_id]
         return tokens
 
     def decode(self, tokens):
@@ -90,5 +97,6 @@ class BPETokenizer:
         self.vocab = data["vocab"]
         self.char2num = data["char2num"]
         self.num2char = {int(k): v for k, v in data["num2char"].items()}
+
 
 
