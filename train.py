@@ -91,3 +91,7 @@ for epoch in range(num_epochs):
         total_loss += loss.item()
 
     print(f"Epoch {epoch + 1}, Loss: {total_loss / len(train_loader):.4f}")
+
+PATH = '/content/drive/MyDrive/my_transformer.pth'
+torch.save(model.state_dict(), PATH)
+print(f"Модель сохранена по пути: {PATH}")
