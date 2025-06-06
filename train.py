@@ -43,8 +43,8 @@ optimizer = optim.Adam(model.parameters(), lr=lr)
 criterion = nn.CrossEntropyLoss(ignore_index=0)
 
 dataset = load_dataset("bentrevett/multi30k", split="train")
-src_lines = [example['en'] for example in dataset][:100]
-tgt_lines = [example['de'] for example in dataset][:100]
+src_lines = [example['en'] for example in dataset]
+tgt_lines = [example['de'] for example in dataset]
 tokenizer_src = BPETokenizer()
 tokenizer_src.load_vocab("vocab_en.json")
 tokenizer_tgt = BPETokenizer()
