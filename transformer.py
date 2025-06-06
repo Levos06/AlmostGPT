@@ -12,8 +12,8 @@ class Transformer(nn.Module):
         self.src_embedding = nn.Embedding(src_vocab_size, d_model)
         self.tgt_embedding = nn.Embedding(tgt_vocab_size, d_model)
         self.pos_encoding = PositionalEncoding(d_model, max_len)
-        self.encoder = TransformerEncoder(d_model, d_ff, num_heads, num_layers)
-        self.decoder = TransformerDecoder(d_model, d_ff, num_heads, num_layers)
+        self.encoder = TransformerEncoder(d_model, num_heads, d_ff, num_layers, dropout)
+        self.decoder = TransformerDecoder(d_model, num_heads, d_ff, num_layers, dropout)
         self.output_linear = nn.Linear(d_model, tgt_vocab_size)
         self.dropout = nn.Dropout(dropout)
 

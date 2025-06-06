@@ -37,21 +37,3 @@ class TranslationDataset(Dataset):
         return torch.tensor(src_ids), torch.tensor(tgt_ids)
 
 
-def collate_fn(self, batch):
-    src_batch, tgt_batch = zip(*batch)
-
-    # Определяем максимальную длину в батче
-    max_len_src = max(len(seq) for seq in src_batch)
-    max_len_tgt = max(len(seq) for seq in tgt_batch)
-
-    # Создаем паддинговые тензоры
-    padded_src = torch.full((len(src_batch), max_len_src), self.pad_id_src, dtype=torch.long)
-    padded_tgt = torch.full((len(tgt_batch), max_len_tgt), self.pad_id_tgt, dtype=torch.long)
-
-    # Копируем значения
-    for i, (src_seq, tgt_seq) in enumerate(zip(src_batch, tgt_batch)):
-        padded_src[i, :len(src_seq)] = src_seq
-        padded_tgt[i, :len(tgt_seq)] = tgt_seq
-
-    return padded_src, padded_tgt
-

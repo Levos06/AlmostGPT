@@ -15,40 +15,37 @@ class MultiHeadAttention(nn.Module):
         self.q_proj = nn.Linear(d_model, d_model)
         self.k_proj = nn.Linear(d_model, d_model)
         self.v_proj = nn.Linear(d_model, d_model)
-
         self.out_proj = nn.Linear(d_model, d_model)
 
-    def forward(self, query, key, value, mask=None):
-        batch_size, seq_len, _ = query.size()
+    def split_heads(self, x):
+        batch_size, seq_len, d_model = x.size()
+        assert d_model == self.num_heads * self.head_dim
+        x = x.view(batch_size, seq_len, self.num_heads, self.head_dim)
+        return x.permute(0, 2, 1, 3)  # (batch, heads, seq_len, head_dim)
 
-        # Линейные проекции
-        Q = self.q_proj(query)  # [batch, seq_len, heads, head_dim]
+    def forward(self, query, key, value, mask=None):
+        batch_size = query.size(0)
+
+        Q = self.q_proj(query)
         K = self.k_proj(key)
         V = self.v_proj(value)
 
-        # Разбиение на головы
-        def split_heads(x):
-            return x.view(batch_size, seq_len, self.num_heads, self.head_dim).permute(0, 2, 1, 3)
+        Q = self.split_heads(Q)
+        K = self.split_heads(K)
+        V = self.split_heads(V)
 
-        Q = split_heads(Q)  # [batch, heads, seq_len, head_dim]
-        K = split_heads(K)
-        V = split_heads(V)
-
-        # Attention scores
-        scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.head_dim)  # [batch, heads, seq_len, seq_len]
+        scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.head_dim)
 
         if mask is not None:
-            scores = scores.masked_fill(mask == 0, float('-inf'))
+            scores = scores.masked_fill(mask == 0, -1e9)
+
 
         attention_weights = torch.softmax(scores, dim=-1)
-
-        attention_output = torch.matmul(attention_weights, V)  # [batch, heads, seq_len, head_dim]
+        attention_output = torch.matmul(attention_weights, V)
 
         # Объединение голов
-        concat = attention_output.permute(0, 2, 1, 3).contiguous()  # [batch, seq_len, heads, head_dim]
-        concat = concat.view(batch_size, seq_len, self.d_model)     # [batch, seq_len, d_model]
+        concat = attention_output.permute(0, 2, 1, 3).contiguous()
+        concat = concat.view(batch_size, -1, self.d_model)
 
-        # Финальная проекция
         output = self.out_proj(concat)
-
         return output

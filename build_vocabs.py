@@ -1,7 +1,7 @@
 from datasets import load_dataset
 from tokenizer import BPETokenizer
 
-dataset = load_dataset("bentrevett/multi30k", split="train")  # загружаем один раз
+dataset = load_dataset("bentrevett/multi30k", split="train")
 
 for lang in ('en', 'de'):
     print(f"Training tokenizer for language: {lang}")
