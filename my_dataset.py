@@ -24,6 +24,8 @@ class TranslationDataset(Dataset):
         src_ids = self.tokenizer_src.encode(self.src_lines[idx], add_special_tokens=False)
         # Токенизируем выход (немецкий) и добавляем <sos> и <eos>
         tgt_ids = self.tokenizer_tgt.encode(self.tgt_lines[idx], add_special_tokens=False)
+        if len(tgt_ids) > self.max_len - 2:
+            tgt_ids = tgt_ids[:self.max_len - 2]
         tgt_ids = [self.sos_id_tgt] + tgt_ids + [self.eos_id_tgt]
 
         # Усечение до max_len
