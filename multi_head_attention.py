@@ -22,7 +22,7 @@ class MultiHeadAttention(nn.Module):
         batch_size, seq_len, _ = query.size()
 
         # Линейные проекции
-        Q = self.q_proj(query)
+        Q = self.q_proj(query)  # [batch, seq_len, heads, head_dim]
         K = self.k_proj(key)
         V = self.v_proj(value)
 
