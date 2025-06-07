@@ -43,12 +43,12 @@ optimizer = optim.Adam(model.parameters(), lr=lr)
 criterion = nn.CrossEntropyLoss(ignore_index=0)
 
 dataset = load_dataset("bentrevett/multi30k", split="train")
-src_lines = [example['en'] for example in dataset]
-tgt_lines = [example['de'] for example in dataset]
+src_lines = [example['en'] for example in dataset][:10]
+tgt_lines = [example['de'] for example in dataset][:10]
 tokenizer_src = BPETokenizer()
 tokenizer_src.load_vocab("vocab_en.json")
 tokenizer_tgt = BPETokenizer()
-tokenizer_src.load_vocab("vocab_de.json")
+tokenizer_tgt.load_vocab("vocab_de.json")
 
 # Загрузка данных
 train_dataset = TranslationDataset(src_lines, tgt_lines, tokenizer_src, tokenizer_tgt, max_len=128)

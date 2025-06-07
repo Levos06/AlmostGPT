@@ -1,5 +1,6 @@
 import torch
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def generate_pad_mask(seq, pad_token_id):
     """
@@ -19,7 +20,7 @@ def combine_masks(pad_mask, causal_mask):
     """
     Объединяет паддинг-маску и причинную маску.
     """
-    return pad_mask & causal_mask.unsqueeze(0).unsqueeze(1)  # broadcasting to [batch, 1, seq_len, seq_len]
+    return pad_mask.to(device) & causal_mask.to(device).unsqueeze(0).unsqueeze(1)  # broadcasting to [batch, 1, seq_len, seq_len]
 
 
 def generate_src_mask(src, pad_token_id):
