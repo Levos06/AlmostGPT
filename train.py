@@ -69,6 +69,8 @@ for epoch in range(num_epochs):
     total_loss = 0
     i = 0
     for src, tgt in train_loader:
+        print(src)
+        print(tgt)
         i += 1
         print(f"{i}/{len(train_loader)}")
         src = src.to(device)

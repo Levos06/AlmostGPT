@@ -75,9 +75,26 @@ class BPETokenizer:
                   f" {len(self.num_text):>9} | {len(self.num_text) / self.original_length:>7.4f} | {len(self.vocab):>6}")
 
     def encode(self, text, add_special_tokens=False):
-        tokens = [self.char2num.get(c, self.unk_id) for c in text]
+        tokens = []
+        i = 0
+        n = len(text)
+
+        while i < n:
+            # Пытаемся найти самое длинное совпадение, начиная с максимальной длины (7)
+            for l in range(min(7, n - i), 0, -1):
+                substr = text[i:i + l]
+                if substr in self.char2num:
+                    tokens.append(self.char2num[substr])
+                    i += l
+                    break
+            else:
+                # Если символ не найден в словаре, используем unk_id
+                tokens.append(self.unk_id)
+                i += 1
+
         if add_special_tokens:
             tokens = [self.sos_id] + tokens + [self.eos_id]
+
         return tokens
 
     def decode(self, tokens):
